@@ -1,0 +1,99 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>{{ stock }} — Dashboard</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <style>
+    html,body{margin:0;padding:0;font-family:Inter, Arial, sans-serif;background:#050505;color:#EEE}
+    .topbar{background:#071107;padding:18px 28px;border-bottom:1px solid rgba(0,255,87,0.04)}
+    .wrap{max-width:1100px;margin:18px auto;padding:22px;background:linear-gradient(180deg,#0b0b0b, #0f0f0f);border-radius:12px;
+         box-shadow:0 12px 50px rgba(0,0,0,0.6)}
+    .header{display:flex;justify-content:space-between;align-items:center;gap:12px}
+    h1{margin:0;color:#fff;text-shadow:0 0 12px rgba(0,255,87,0.12)}
+    .chip{color:#11FF66;font-weight:700}
+    .cards{display:flex;gap:14px;margin-top:16px;flex-wrap:wrap}
+    .card{background:#070707;padding:14px;border-radius:10px;flex:1;min-width:200px;border-left:4px solid rgba(0,255,87,0.12)}
+    .card h4{margin:0 0 8px;color:#9fffbf}
+    .card p{margin:0;color:#cfcfcf}
+    .grid{display:grid;grid-template-columns:1fr 360px;gap:18px;margin-top:18px}
+    .chart-card{background:#070707;padding:12px;border-radius:10px}
+    img{max-width:100%;display:block;border-radius:8px}
+    .company{display:flex;gap:12px;align-items:center}
+    .logo{width:72px;height:72px;border-radius:8px;background:#0b0b0b;display:flex;align-items:center;justify-content:center}
+    .logo img{max-width:100%;max-height:100%}
+    a.back{color:#00FF57;text-decoration:none;font-weight:600}
+    pre.summary{white-space:pre-wrap;color:#cfcfcf;max-height:140px;overflow:auto;padding:10px;background:#0b0b0b;border-radius:6px}
+    @media (max-width:980px){.grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div style="max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between">
+      <div style="color:#bfbfbf">Pro Stock Dashboard</div>
+      <div><a class="back" href="/">← Back</a></div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="header">
+      <div>
+        <h1>{{ company.name }}</h1>
+        <div class="chip">{{ stock }} • {{ company.sector }} • {{ company.country }}</div>
+      </div>
+      <div style="text-align:right">
+        <div style="color:#bdbdbd">Market Cap</div>
+        <div style="font-weight:800;color:#11FF66">{{ market_cap }}</div>
+      </div>
+    </div>
+
+    <div class="cards" role="region" aria-label="indicators">
+      <div class="card">
+        <h4>Price</h4>
+        <p>${{ indicators.last_close }}</p>
+      </div>
+      <div class="card">
+        <h4>MA (20 / 50 / 200)</h4>
+        <p>{{ indicators.ma20 }} / {{ indicators.ma50 }} / {{ indicators.ma200 }}</p>
+      </div>
+      <div class="card">
+        <h4>RSI (14)</h4>
+        <p>{{ indicators.rsi14 }}</p>
+      </div>
+      <div class="card">
+        <h4>MACD</h4>
+        <p>MACD: {{ indicators.macd }} | Signal: {{ indicators.macd_signal }}</p>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="chart-card">
+        <img src="{{ url_for('static', filename=plot_file) }}" alt="Dashboard chart">
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div class="card company">
+          <div class="logo">
+            {% if company.logo_url %}
+              <img src="{{ company.logo_url }}" alt="logo">
+            {% else %}
+              <div style="color:#666">No Logo</div>
+            {% endif %}
+          </div>
+          <div>
+            <h4 style="margin:0;color:#fff">{{ company.name }}</h4>
+            <p style="margin:4px 0;color:#cfcfcf">{{ company.industry }} • {{ company.country }}</p>
+            <p style="margin:0"><a href="{{ company.website }}" target="_blank" style="color:#9df6b9">{{ company.website or '' }}</a></p>
+          </div>
+        </div>
+
+        <div class="card">
+          <h4>Summary</h4>
+          <pre class="summary">{{ company.summary or "No summary available." }}</pre>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</body>
+</html>
