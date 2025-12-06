@@ -50,25 +50,21 @@ pipeline {
             }
         }
 
-        stage('Package') {
-            steps {
-                // Create a zip of the workspace (excluding venv)
-                bat '''
-                if exist stock_build rmdir /S /Q stock_build
-                mkdir stock_build
-                xcopy * stock_build /E /I /Y
-                rmdir /S /Q stock_build\\%VENV_DIR%
-                powershell -Command "$d = Get-Date -Format yyyyMMddHHmmss; Compress-Archive -Path 'stock_build\\*' -DestinationPath 'stock_predictor_$d.zip' -Force"
-                '''
-            }
-        }
-
-        stage('Archive') {
-            steps {
-                archiveArtifacts artifacts: 'stock_predictor_*.zip', fingerprint: true
-            }
-        }
+      stage('Package') {
+    steps {
+        // Zip everything in the workspace
+        bat '''
+        powershell -Command "$d = Get-Date -Format yyyyMMddHHmmss; Compress-Archive -Path * -DestinationPath 'stock_predictor_$d.zip' -Force"
+        '''
     }
+}
+
+stage('Archive') {
+    steps {
+        archiveArtifacts artifacts: 'stock_predictor_*.zip', fingerprint: true
+    }
+}
+
 
     post {
         success {
