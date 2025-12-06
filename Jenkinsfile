@@ -8,14 +8,13 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                // Jenkins already checked out, but this is okay
                 checkout scm
             }
         }
 
         stage('Setup Python') {
             steps {
-                // Windows commands -> use 'bat', not 'sh'
+                // Create virtual environment and upgrade pip (Windows)
                 bat '''
                 python -m venv %VENV_DIR%
                 call %VENV_DIR%\\Scripts\\activate
@@ -50,21 +49,19 @@ pipeline {
             }
         }
 
-      stage('Package') {
-    steps {
-        // Zip everything in the workspace
-        bat '''
-        powershell -Command "$d = Get-Date -Format yyyyMMddHHmmss; Compress-Archive -Path * -DestinationPath 'stock_predictor_$d.zip' -Force"
-        '''
-    }
-}
+        stage('Package') {
+            steps {
+                // Simple: zip everything in workspace into stock_predictor.zip
+                bat 'powershell -Command Compress-Archive -Path * -DestinationPath stock_predictor.zip -Force'
+            }
+        }
 
-stage('Archive') {
-    steps {
-        archiveArtifacts artifacts: 'stock_predictor_*.zip', fingerprint: true
+        stage('Archive') {
+            steps {
+                archiveArtifacts artifacts: 'stock_predictor.zip', fingerprint: true
+            }
+        }
     }
-}
-
 
     post {
         success {
